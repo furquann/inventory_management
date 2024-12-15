@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}Purchase{% endblock title %}
+
+{% block content %}
+<div class="m-3 d-flex justify-content-between align-items-center">
+    <h2>Purchase List</h2>
+    <a href="#" class="btn btn-primary" type="button" id="addPurchaseBtn">
+      <i class="fa-regular fa-square-plus" style="margin-right: .3em"></i>Add Purchase</a>
+</div>
+<nav class="navbar bg-body-tertiary">
+    <div class="container-fluid justify-content-end">
+        <form class="d-flex align-items-center" role="search" action="{% url 'search_purchase' %}" method="GET">
+            <span class="me-2">Search:</span> 
+            <input class="form-control me-2" type="search" aria-label="Search" name="query">
+        </form>
+    </div>
+</nav>
+<table class="table table-striped mx-3">
+  <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Product</th>
+      <th scope="col">Quantity</th>
+      <th scope="col">Supplier</th>
+      <th scope="col">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for purchase in purchases %}
+      <tr>
+        <td>{{ purchase.id }}</td>
+        <td>{{ purchase.product_id.pname }}</td>
+        <td>{{ purchase.quantity }}</td>
+        <td>{{ purchase.supplier_id.supplier_name }}</td>
+        <td>
+          <div>
+            <a href="#" id="editPurchaseBtn-{{purchase.id}}"><i class="fa-solid fa-pen-to-square" style="background-color: blue; color: white; padding:.4em"></i></a>
+            <a href="{% url "delete" purchase.id %}"><i class="fa-solid fa-trash" style="background-color: red; color: white; padding:.4em"></i></a>
+          </div>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!--  Add purchase modal starts here  -->
+<div>
+  <div class="modal" tabindex="-1" id="addPurchaseModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="fa-solid fa-plus"></i> Add Purchase</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="{% url "purchase" %}" method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="name">Product Name:</label>
+                <select class="form-select" aria-label="Default select example" name="name">
+                  <option selected>Select Product Name</option>
+                  {% for product in products %}
+                  <option value="{{ product.pname }}">{{ product.pname }}</option>
+                  {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="quantity">Quantity:</label>
+                <input type="text" class="form-control" id="quantity" name="quantity" required>
+            </div>
+            <div class="form-group">
+                <label for="supplier">Supplier:</label>
+                <select class="form-select" aria-label="Default select example" name="supplier">
+                  <option selected>Select Supplier Name:</option>
+                  {% for supplier in suppliers %}
+                  <option value="{{ supplier.supplier_name }}">{{ supplier.supplier_name }}</option>
+                  {% endfor %}
+                </select>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary">Save</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!--  Add purchase modal ends here  -->
+
+<!--  Edit purchase modal starts here  -->
+{% for purchase in purchases %}
+<div>
+  <div class="modal" tabindex="-1" id="editPurchaseModal-{{purchase.id}}">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="fa-solid fa-pen-to-square"></i> Edit Purchase</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="{% url "edit" purchase.id %}" method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="name">Product Name:</label>
+                <select class="form-select" aria-label="Default select example" name="name">
+                  <option selected>Select Product Name</option>
+                  {% for product in products %}
+                  <option value="{{ product.pname }}" {% if product.pname == purchase.product_id.pname %} selected {% endif %}>{{ product.pname }}</option>
+                  {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="quantity">Quantity:</label>
+                <input type="text" value="{{purchase.quantity}}" class="form-control" id="quantity" name="quantity" required>
+            </div>
+            <div class="form-group">
+                <label for="supplier">Supplier:</label>
+                <select class="form-select" aria-label="Default select example" name="supplier">
+                  <option selected>Select Supplier Name:</option>
+                  {% for supplier in suppliers %}
+                  <option value="{{ supplier.supplier_name }}" {% if supplier.supplier_name == purchase.supplier_id.supplier_name %} selected {% endif %}>{{ supplier.supplier_name }}</option>
+                  {% endfor %}
+                </select>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary">Save</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+<!--  Edit purchase modal ends here  -->
+
+<!--  Pagination Starts Here  -->
+
+{% include "pagination.html" with VARIABLE_NAME=purchases %}
+
+<!-- Pagination Ends Here  -->
+
+<script>
+
+  {% for purchase in purchases %}
+  document.getElementById('editPurchaseBtn-{{purchase.id}}').addEventListener('click', function() {
+      var modal = new bootstrap.Modal(document.getElementById('editPurchaseModal-{{purchase.id}}'));
+      modal.show();
+  });
+  {% endfor %}
+
+  document.getElementById('addPurchaseBtn').addEventListener('click', function() {
+      var modal = new bootstrap.Modal(document.getElementById('addPurchaseModal'));
+      modal.show();
+  });
+</script>
+
+{% endblock content %}

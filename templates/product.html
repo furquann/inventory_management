@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+
+{% block title %}Products{% endblock title %}
+
+{% block content %}
+<div class="m-3 d-flex justify-content-between align-items-center">
+    <h2>Products List</h2>
+    <a href="#" class="btn btn-primary" type="button" id="addProductBtn">
+      <i class="fa-regular fa-square-plus" style="margin-right: .3em"></i> Add Product</a>
+</div>
+<nav class="navbar bg-body-tertiary">
+    <div class="container-fluid justify-content-end">
+        <form class="d-flex align-items-center" role="search" action="{% url 'search_product' %}" method="GET">
+            <span class="me-2">Search:</span> 
+            <input class="form-control me-2" type="search" aria-label="Search" name="query">
+        </form>
+    </div>
+</nav>
+<table class="table table-striped mx-3">
+  <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Category</th>
+      <th scope="col">Brand Name</th>
+      <th scope="col">Product Name</th>
+      <th scope="col">Product Model</th>
+      <th scope="col">Quantity</th>
+      <th scope="col">Supplier Name</th>
+      <th scope="col">Status</th>
+      <th scope="col">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for product in products %}
+      <tr>
+        <td>{{ product.id }}</td>
+        <td>{{ product.category_id }}</td>
+        <td>{{ product.brand_id }}</td>
+        <td>{{ product.pname }}</td>
+        <td>{{ product.model }}</td>
+        <td>{{ product.quantity }}</td>
+        <td>{{ product.supplier }}</td>
+        <td>{{ product.get_status_display }}</td>
+        <td>
+          <div>
+            <a href="#" id="editProductBtn-{{product.id}}"><i class="fa-solid fa-pen-to-square" style="background-color: blue; color: white; padding:.4em"></i></a>
+            <a href="{% url "delete" product.id %}"><i class="fa-solid fa-trash" style="background-color: red; color: white; padding:.4em"></i></a>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+  </tbody>
+</table>
+
+<!--  Add product modal starts here -->
+<div>
+  <div class="modal" tabindex="-1" id="addProductModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="fa-solid fa-plus"></i> Add Product</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="{% url "product" %}" method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+              <label for="category">Select Category:</label>
+              <select class="form-select" aria-label="Default select example" name="category">
+                <option selected>Select Category Name:</option>
+                {% for category in categories %}
+                <option value="{{ category.name }}">{{ category.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="brand">Select Brand:</label>
+              <select class="form-select" aria-label="Default select example" name="brand">
+                <option selected>Select Brand Name:</option>
+                {% for brand in brands %}
+                <option value="{{ brand.bname }}">{{ brand.bname }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="pname">Product Name:</label>
+              <input type="text" class="form-control" id="pname" name="pname" required>
+            </div>
+            <div class="form-group">
+              <label for="model">Product Model:</label>
+              <input type="text" class="form-control" id="model" name="model" required>
+            </div>
+            <div class="form-group">
+              <label for="description">Description:</label>
+              <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+            </div>
+            <div class="form-group">
+              <label for="quantity">Product Quantity:</label>
+              <input type="number" class="form-control" id="quantity" name="quantity" required>
+            </div>
+            <div class="form-group">
+              <label for="base_price">Product Base Price:</label>
+              <input type="number" class="form-control" id="quantity" name="base_price" required>
+            </div>
+            <div class="form-group">
+              <label for="tax">Product Tax:</label>
+              <input type="number" class="form-control" id="quantity" name="tax" required>
+            </div>
+            <div class="form-group">
+              <label for="supplier">Supplier Name:</label>
+              <select class="form-select" aria-label="Default select example" name="supplier">
+                <option selected>Select Supplier Name:</option>
+                {% for supplier in suppliers %}
+                <option value="{{ supplier.supplier_name }}">{{ supplier.supplier_name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary">Save</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!--  Add product modal ends here -->
+
+<!--  Edit product modal starts here -->
+{% for product in products %}
+<div>
+  <div class="modal" tabindex="-1" id="editProductModal-{{product.id}}">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="fa-solid fa-pen-to-square"></i> Edit Product</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="{% url "edit" product.id %}" method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+              <label for="category">Select Category:</label>
+              <select class="form-select" aria-label="Default select example" name="category">
+                <option selected>Select Category Name:</option>
+                {% for category in categories %}
+                <option value="{{ category.name }}" {% if category.name == product.category_id.name %} selected {% endif %}>{{ category.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="brand">Select Brand:</label>
+              <select class="form-select" aria-label="Default select example" name="brand">
+                <option selected>Select Brand Name:</option>
+                {% for brand in brands %}
+                <option value="{{ brand.bname }}" {% if brand.bname == product.brand_id.bname %} selected {% endif %}>{{ brand.bname }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="pname">Product Name:</label>
+              <input type="text" value="{{product.pname}}" class="form-control" id="pname" name="pname" required>
+            </div>
+            <div class="form-group">
+              <label for="model">Product Model:</label>
+              <input type="text" value="{{product.model}}" class="form-control" id="model" name="model" required>
+            </div>
+            <div class="form-group">
+              <label for="description">Description:</label>
+              <textarea class="form-control" id="description" name="description" rows="3" required>{{product.description}}</textarea>
+            </div>
+            <div class="form-group">
+              <label for="quantity">Product Quantity:</label>
+              <input type="number" value="{{product.quantity}}" class="form-control" id="quantity" name="quantity" required>
+            </div>
+            <div class="form-group">
+              <label for="base_price">Product Base Price:</label>
+              <input type="number" value="{{product.base_price}}" class="form-control" id="quantity" name="base_price" required>
+            </div>
+            <div class="form-group">
+              <label for="tax">Product Tax:</label>
+              <input type="number" value="{{product.tax}}" class="form-control" id="quantity" name="tax" required>
+            </div>
+            <div class="form-group">
+              <label for="supplier">Supplier Name:</label>
+              <select class="form-select" aria-label="Default select example" name="supplier">
+                <option selected>Select Supplier Name:</option>
+                {% for supplier in suppliers %}
+                <option value="{{ supplier.supplier_name }}" {% if supplier.supplier_name == product.supplier.supplier_name %} selected {% endif %}>{{ supplier.supplier_name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary">Save</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+<!--  Edit product modal ends here -->
+
+<!--  Pagination Starts Here  -->
+
+{% include "pagination.html" with VARIABLE_NAME=products %}
+
+<!-- Pagination Ends Here  -->
+
+<script>
+
+  {% for product in products %}
+  document.getElementById('editProductBtn-{{product.id}}').addEventListener('click', function() {
+      var modal = new bootstrap.Modal(document.getElementById('editProductModal-{{product.id}}'));
+      modal.show();
+  });
+  {% endfor %}
+
+  document.getElementById('addProductBtn').addEventListener('click', function() {
+      var modal = new bootstrap.Modal(document.getElementById('addProductModal'));
+      modal.show();
+  });
+</script>
+
+{% endblock content %}

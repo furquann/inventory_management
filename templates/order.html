@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}Orders{% endblock title %}
+
+{% block content %}
+<div class="m-3 d-flex justify-content-between align-items-center">
+    <h2>Manage Orders</h2>
+    <a href="#" class="btn btn-primary" type="button" id="newOrderBtn">
+      <i class="fa-regular fa-square-plus" style="margin-right: .3em"></i> New Order</a>
+</div>
+<nav class="navbar bg-body-tertiary">
+    <div class="container-fluid justify-content-end">
+        <form class="d-flex align-items-center" role="search" action="{% url 'search_order' %}" method="GET">
+            <span class="me-2">Search:</span> 
+            <input class="form-control me-2" type="search" aria-label="Search" name="query">
+        </form>
+    </div>
+</nav>
+<table class="table table-striped mx-3">
+  <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Product</th>
+      <th scope="col">Total Items</th>
+      <th scope="col">Customer</th>
+      <th scope="col">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for order in orders %}
+      <tr>
+        <td>{{ order.id }}</td>
+        <td>{{ order.product_id.pname }}</td>
+        <td>{{ order.total_shipped }}</td>
+        <td>{{ order.customer_id.name }}</td>
+        <td>
+          <div>
+            <a href="#" id="editOrderBtn-{{order.id}}"><i class="fa-solid fa-pen-to-square" style="background-color: blue; color: white; padding:.4em"></i></a>
+            <a href="{% url "delete" order.id %}"><i class="fa-solid fa-trash" style="background-color: red; color: white; padding:.4em"></i></a>
+          </div>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- Add Orders Modal Starts Here -->
+<div>
+  <div class="modal" tabindex="-1" id="addOrderModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="fa-solid fa-plus"></i> Add Order</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="{% url "orders" %}" method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="name">Product Name:</label>
+                <select class="form-select" aria-label="Default select example" name="name">
+                  <option selected>Select Product Name</option>
+                  {% for product in products %}
+                  <option value="{{ product.pname }}">{{ product.pname }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="total_item">Total Item:</label>
+                <input type="text" class="form-control" id="mobile" name="total_item" required>
+              </div>
+              <div class="form-group">
+                <label for="cname">Customer Name:</label>
+                <select class="form-select" aria-label="Default select example" name="cname">
+                  <option selected>Select Customer Name</option>
+                  {% for customer in customers %}
+                  <option value="{{ customer.name }}">{{ customer.name }}</option>
+                  {% endfor %}
+                </select>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary">Save</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+          </div>
+          </form>
+        </div>
+    </div>
+  </div>
+</div>
+<!-- Add Orders Modal Ends Here -->
+
+<!-- Edit Orders Modal Starts Here -->
+{% for order in orders %}
+<div>
+  <div class="modal" tabindex="-1" id="editOrderModal-{{order.id}}">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="fa-solid fa-pen-to-square"></i> Edit Order</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="{% url "edit" order.id %}" method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="name">Product Name:</label>
+                <select class="form-select" aria-label="Default select example" name="name">
+                  <option selected>Select Product Name</option>
+                  {% for product in products %}
+                  <option value="{{ product.pname }}" {% if product.pname == order.product_id.pname %} selected {% endif %}>{{ product.pname }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="total_item">Total Item:</label>
+                <input type="text" value="{{order.total_shipped}}" class="form-control" id="mobile" name="total_item" required>
+              </div>
+              <div class="form-group">
+                <label for="cname">Customer Name:</label>
+                <select class="form-select" aria-label="Default select example" name="cname">
+                  <option selected>Select Customer</option>
+                  {% for customer in customers %}
+                  <option value="{{ customer.name }}" {% if customer.name == order.customer_id.name %} selected {% endif %}>{{ customer.name }}</option>
+                  {% endfor %}
+                </select>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary">Save</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+          </div>
+          </form>
+        </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+<!-- Edit Orders Modal Ends Here -->
+
+<!--  Pagination Starts Here  -->
+
+{% include "pagination.html" with VARIABLE_NAME=orders %}
+
+<!-- Pagination Ends Here  -->
+
+<script>
+  {% for order in orders %}
+  document.getElementById('editOrderBtn-{{order.id}}').addEventListener('click', function() {
+      var modal = new bootstrap.Modal(document.getElementById('editOrderModal-{{order.id}}'));
+      modal.show();
+  });
+  {% endfor %}
+
+  document.getElementById('newOrderBtn').addEventListener('click', function() {
+      var modal = new bootstrap.Modal(document.getElementById('addOrderModal'));
+      modal.show();
+  });
+</script>
+
+{% endblock content %}

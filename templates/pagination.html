@@ -1,0 +1,42 @@
+{% comment %} pass objects with their VARIABLE_NAME name here that you want to paginate.
+Use comment like ---> {% include "pagination.html" with VARIABLE_NAME=customers %}  //here customer is the object that has to be paginates
+{% endcomment %}
+
+<nav aria-label="...">
+    {% comment %} {% if VARIABLE_NAME.has_other_pages %} {% endcomment %}
+    <ul class="pagination justify-content-end">
+        {% if VARIABLE_NAME.has_previous %}
+        <li class="page-item">
+            <a href="?page={{ VARIABLE_NAME.previous_page_number }}" class="page-link">Previous</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <a href="?page=1" class="page-link">Previous</a>
+        </li>
+        {% endif %}
+
+        {% for i in VARIABLE_NAME.paginator.page_range %}
+        {% if VARIABLE_NAME.number == i %}
+        <li class="page-item active">
+            <a href="?page={{ i }}" class="page-link">{{ i }}</a>
+        </li>
+        {% else %}
+        <li class="page-item">
+            <a href="?page={{ i }}" class="page-link">{{ i }}</a>
+        </li>
+        {% endif %}
+        {% endfor %}
+
+        {% if VARIABLE_NAME.has_next %}
+        <li class="page-item">
+            <a href="?page={{ VARIABLE_NAME.next_page_number }}" class="page-link">Next</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <a href="?page={{ VARIABLE_NAME.paginator.num_pages }}" class="page-link">Next</a>
+        </li>
+        {% endif %}
+
+    </ul>
+    {% comment %} {% endif %} {% endcomment %}
+</nav>

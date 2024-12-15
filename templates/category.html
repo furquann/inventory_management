@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Category{% endblock title %}
+
+{% block content %}
+<div class="m-3 d-flex justify-content-between align-items-center">
+    <h2>Category List</h2>
+    <a href="#" class="btn btn-primary" type="button" id="addCategoryBtn">
+      <i class="fa-regular fa-square-plus" style="margin-right: .3em"></i> Add Category
+    </a>
+</div>
+<nav class="navbar bg-body-tertiary">
+    <div class="container-fluid justify-content-end">
+        <form class="d-flex align-items-center" role="search" action="{% url 'search_category' %}" method="GET">
+            <span class="me-2">Search:</span> 
+            <input class="form-control me-2" type="search" aria-label="Search" name="query"> 
+        </form>
+    </div>
+</nav>
+<table class="table table-striped mx-3">
+  <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Category Name</th>
+      <th scope="col">Status</th>
+      <th scope="col">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for category in categories %}
+    <tr>
+      <td>{{ category.id }}</td>
+      <td>{{ category.name }}</td>
+      <td>{{ category.get_status_display }}</td>
+      <td>
+        <div>
+          <a href="#" id="editCategoryBtn-{{category.id}}"><i class="fa-solid fa-pen-to-square" style="background-color: blue; color: white; padding:.4em"></i></a>
+          <a href="{% url "delete" category.id %}"><i class="fa-solid fa-trash" style="background-color: red; color: white; padding:.4em"></i></a>
+        </div>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- Add Category Modal Starts Here -->
+<div>
+  <div class="modal" tabindex="-1" id="addCategoryModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="fa-solid fa-plus"></i> Add Category</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="{% url "category" %}" method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="name">Category Name:</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary">Add</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+          </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Add Category Modal Ends Here -->
+
+<!-- Edit Category Modal Starts Here -->
+{% for category in categories %}
+<div>
+  <div class="modal" tabindex="-1" id="editCategoryModal-{{category.id}}">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="fa-solid fa-pen-to-square"></i> Edit Category</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="{% url "edit" category.id %}" method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="name">Category Name:</label>
+                <input type="text" value="{{category.name}}" class="form-control" id="name" name="name" required>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary">Add</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+          </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+<!-- Edit Category Modal Ends Here -->
+
+<!--  Pagination Starts Here  -->
+
+{% include "pagination.html" with VARIABLE_NAME=customers %}
+
+<!-- Pagination Ends Here  -->
+
+<script>
+  {% for category in categories %}
+  document.getElementById('editCategoryBtn-{{category.id}}').addEventListener('click', function() {
+      var modal = new bootstrap.Modal(document.getElementById('editCategoryModal-{{category.id}}'));
+      modal.show();
+  });
+  {% endfor %}
+
+  document.getElementById('addCategoryBtn').addEventListener('click', function() {
+      var modal = new bootstrap.Modal(document.getElementById('addCategoryModal'));
+      modal.show();
+  });
+</script>
+
+{% endblock content %}

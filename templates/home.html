@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock title %}
+
+{% block content %}
+
+<h2 class="m-3">Inventory</h2>
+<nav class="navbar bg-body-tertiary">
+    <div class="container-fluid justify-content-end">
+        <form class="d-flex align-items-center" role="search">
+            <span class="me-2">Search:</span> 
+            <input class="form-control me-2" type="search" aria-label="Search">
+        </form>
+    </div>
+</nav>
+<table class="table table-striped mx-3">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Product/Code</th>
+        <th scope="col">Starting Inventory</th>
+        <th scope="col">Inventory Recieved</th>
+        <th scope="col">Inventory Shiped</th>
+        <th scope="col">Inventory in Hand</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for product in products %}
+        <tr>
+          <td>{{ forloop.counter }}</td> 
+          <td>{{ product.pname }} | {{ product.id }}</td>
+          <td>{{ product.quantity }}</td>
+          <td>{{ orders.total_shipped }}</td>
+          <td>
+            {% if product.total_shipped %}
+              {{ product.total_shipped }}
+            {% else %}
+              0
+            {% endif %}
+          </td>
+          <td style="color:green; font-weight: bold;">{{ product.inventories_left }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+  </table>
+
+{% endblock content %}

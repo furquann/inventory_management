@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Brand{% endblock title %}
+
+{% block content %}
+<div class="m-3 d-flex justify-content-between align-items-center">
+    <h2>Brand List</h2>
+    <a href="#" class="btn btn-primary align-items-center" role="button" id="addBrandBtn">
+      <i class="fa-regular fa-square-plus" style="margin-right: .3em"></i> New Brand
+    </a>
+</div>
+<nav class="navbar bg-body-tertiary">
+    <div class="container-fluid justify-content-end">
+        <form class="d-flex align-items-center" role="search" action="{% url 'search_brand' %}" method="GET">
+            <span class="me-2">Search:</span> 
+            <input class="form-control me-2" type="search" aria-label="Search" name="query">
+        </form>
+    </div>
+</nav>
+<table class="table table-striped mx-3">
+  <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Category</th>
+      <th scope="col">Brand Name</th>
+      <th scope="col">Status</th>
+      <th scope="col">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for brand in brands %}
+      <tr>
+          <td>{{ brand.id }}</td>
+          <td>{{ brand.category }}</td>
+          <td>{{ brand.bname }}</td>
+          <td>{{ brand.get_status_display }}</td>
+          <td>
+            <div>
+              <a href="#" id="editBrandBtn-{{brand.id}}" class="edit">
+                <i class="fa-solid fa-pen-to-square" style="background-color: blue; color: white; padding:.4em"></i>
+              </a>
+              <a href="{% url 'delete' brand.id %}"><i class="fa-solid fa-trash" style="background-color: red; color: white; padding:.4em"></i></a>
+            </div>
+          </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- Modal for adding a brand -->
+<div class="modal" tabindex="-1" id="addBrandModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fa-solid fa-plus"></i> Add Brand</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="{% url "brand" %}" method="POST">
+          {% csrf_token %}
+          <div class="form-group">
+              <label for="category">Category:</label>
+              <select class="form-select" aria-label="Default select example" name="category">
+                <option selected>Select Category Name:</option>
+                {% for category in categories %}
+                <option value="{{ category.name }}">{{ category.name }}</option>
+                {% endfor %}
+              </select>
+          </div>
+          <div class="form-group">
+              <label for="name">Name:</label>
+              <input type="text" class="form-control" id="name" name="name" required>
+          </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary">Save</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal for adding ends here -->
+
+
+<!-- Modal for editing a brand -->
+{% for brand in brands %}
+<div class="modal" tabindex="-1" id="editBrandModal-{{brand.id}}">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fa-solid fa-pen-to-square"></i> Edit Brand</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="{% url 'edit' brand.id %}" method="POST">
+          {% csrf_token %}
+          <div class="form-group">
+              <label for="category">Category:</label>
+              <select class="form-select" aria-label="Default select example" name="category">
+                {% for category in categories %}
+                    <option value="{{ category.name }}" {% if category.name == brand.category %} selected {% endif %}>{{ category.name }}</option>
+                {% endfor %}
+              </select>
+          </div>
+          <div class="form-group">
+              <label for="name">Name:</label>
+              <input type="text" value="{{brand.bname}}" class="form-control" id="name" name="name" required>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Save</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+<!-- Modal for editing ends here -->
+
+
+<!--  Pagination Starts Here  -->
+
+{% include "pagination.html" with VARIABLE_NAME=brands %}
+
+<!-- Pagination Ends Here  -->
+
+<script>
+
+  {% for brand in brands %}
+  document.getElementById('editBrandBtn-{{brand.id}}').addEventListener('click', function() {
+      var modal = new bootstrap.Modal(document.getElementById('editBrandModal-{{brand.id}}'));
+      modal.show();
+  });
+  {% endfor %}
+
+
+  document.getElementById('addBrandBtn').addEventListener('click', function() {
+      var modal = new bootstrap.Modal(document.getElementById('addBrandModal'));
+      modal.show();
+  });
+</script>
+
+{% endblock content %}

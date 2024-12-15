@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{% endblock title %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  </head>
+  <body>
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg bg-dark border-bottom border-body" data-bs-theme="dark">
+        <div class="container-fluid">
+          <ul class="navbar-nav mr-auto"> <!-- Align to left corner -->
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/' %}active{% endif %}" aria-current="page" href="{% url 'home' %}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/customer/' %}active{% endif %}" href="{% url 'customer' %}">Customer</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/category/' %}active{% endif %}" href="{% url 'category' %}">Category</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/brand/' %}active{% endif %}" href="{% url 'brand' %}">Brand</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/supplier/' %}active{% endif %}" href="{% url 'supplier' %}">Supplier</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/product/' %}active{% endif %}" href="{% url 'product' %}">Product</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/purchase/' %}active{% endif %}" href="{% url 'purchase' %}">Purchase</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/orders/' %}active{% endif %}" href="{% url 'orders' %}">Orders</a>
+                </li>
+          </ul>
+          <ul class="navbar-nav"> <!-- Align to right corner -->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: white; padding:0.1em 1em; color:black; font-weight:bold; border-radius:15px">
+                Administrator
+              </a>
+              <ul class="dropdown-menu">
+                <li>
+                  <form action="{% url 'logout' %}" method="post">
+                      {% csrf_token %}
+                      <button type="submit" class="dropdown-item">Logout</button>
+                  </form>
+              </li>
+                <li><a class="dropdown-item" href="#">Another action</a></li>
+                <li><a class="dropdown-item" href="#">Something else here</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </nav>
+      
+      
+    <!-- Body -->
+    {% block content %}
+    
+    {% endblock content %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+    <script src="https://kit.fontawesome.com/1adaaa4224.js" crossorigin="anonymous"></script>
+  </body>
+</html>

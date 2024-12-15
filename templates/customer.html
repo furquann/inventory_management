@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}Customer{% endblock title %}
+
+{% block content %}
+<div class="m-3 d-flex justify-content-between align-items-center">
+    <h2>Customer List</h2>
+    <a href="#" class="btn btn-primary" type="button" id="newCustomerBtn" >
+      <i class="fa-regular fa-square-plus" style="margin-right: .3em"></i> New Customer</a>
+</div>
+<nav class="navbar bg-body-tertiary">
+    <div class="container-fluid justify-content-end">
+        <form class="d-flex align-items-center" role="search" action="{% url 'search_customers' %}" method="GET">
+            <span class="me-2">Search:</span> 
+            <input class="form-control me-2" type="search" aria-label="Search" name="query">
+        </form>
+    </div>
+</nav>
+<table class="table table-striped mx-3">
+  <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Name</th>
+      <th scope="col">Address</th>
+      <th scope="col">Mobile</th>
+      <th scope="col">Balance</th>
+      <th scope="col">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for customer in customers %}
+      <tr>
+          <td>{{ customer.id }}</td>
+          <td>{{ customer.name }}</td>
+          <td>{{ customer.address }}</td>
+          <td>{{ customer.mobile }}</td>
+          <td>{{ customer.balance }}</td>
+          <td>
+            <div>
+              <a href="#" id="editCustomerBtn-{{customer.id}}" class="edit">
+                <i class="fa-solid fa-pen-to-square" style="background-color: blue; color: white; padding:.4em"></i>
+              </a>
+              <a href="{% url 'delete' customer.id %}"><i class="fa-solid fa-trash" style="background-color: red; color: white; padding:.4em"></i></a>
+            </div>
+          </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!--  Modal for adding -->
+<div>
+  <div class="modal" tabindex="-1" id="addCustomerModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="fa-solid fa-plus"></i> Add Customer</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="{% url 'customer' %}" method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="mobile">Mobile:</label>
+                <input type="text" class="form-control" id="mobile" name="mobile" required>
+            </div>
+            <div class="form-group">
+                <label for="balance">Balance:</label>
+                <input type="number" class="form-control" id="balance" name="balance" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label for="address">Address:</label>
+                <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary">Save</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!--  Modal for adding ends here -->
+
+<!--  Modal for editing  -->
+{% for customer in customers %}
+<div>
+  <div class="modal" tabindex="-1" id="editCustomerModal-{{customer.id}}">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="fa-solid fa-pen-to-square"></i> Edit Customer</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="{% url 'edit' customer.id %}" method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" value="{{ customer.name }}" class="form-control" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="mobile">Mobile:</label>
+                <input type="text" value="{{ customer.mobile }}" class="form-control" id="mobile" name="mobile" required>
+            </div>
+            <div class="form-group">
+                <label for="balance">Balance:</label>
+                <input type="number" value="{{ customer.balance }}" class="form-control" id="balance" name="balance" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label for="address">Address:</label>
+                <textarea class="form-control" id="address" name="address" rows="3" required>{{ customer.address }}</textarea>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary">Save</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+<!--  Modal for edit ends here -->
+
+
+<!--  Pagination Starts Here  -->
+
+{% include "pagination.html" with VARIABLE_NAME=customers %}
+
+<!-- Pagination Ends Here  -->
+
+<script>
+  {% for customer in customers %}
+  document.getElementById('editCustomerBtn-{{customer.id}}').addEventListener('click', function() {
+      var modal = new bootstrap.Modal(document.getElementById('editCustomerModal-{{customer.id}}'));
+      modal.show();
+  });
+  {% endfor %}
+
+  document.getElementById('newCustomerBtn').addEventListener('click', function() {
+      var modal = new bootstrap.Modal(document.getElementById('addCustomerModal'));
+      modal.show();
+  });
+</script>
+
+{% endblock content %}
